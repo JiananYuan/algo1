@@ -166,16 +166,13 @@ func vs(treenode *node, a int, b int) int {
 		} else {
 			score = -1
 		}
-		if last_player == PLAYER_A {
-			if a == 2 && a_need_update {
-				a_mp["P"] += score
-				a_mp["PP"] += score
-			}
-		} else {
-			if b == 2 && b_need_update {
-				b_mp["P"] += score
-				b_mp["PP"] += score
-			}
+		if a == 2 && a_need_update {
+			a_mp["P"] += score
+			a_mp["PP"] += score
+		}
+		if b == 2 && b_need_update {
+			b_mp["P"] -= score
+			b_mp["PP"] -= score
 		}
 		return score
 	} else if treenode.op_str == "BB" {
@@ -184,46 +181,37 @@ func vs(treenode *node, a int, b int) int {
 		} else {
 			score = -2
 		}
-		if last_player == PLAYER_A {
-			if a == 2 && a_need_update {
-				a_mp["B"] += score
-				a_mp["BB"] += score
-			}
-		} else {
-			if b == 2 && b_need_update {
-				b_mp["B"] += score
-				b_mp["BB"] += score
-			}
+		if a == 2 && a_need_update {
+			a_mp["B"] += score
+			a_mp["BB"] += score
+		}
+		if b == 2 && b_need_update {
+			b_mp["B"] -= score
+			b_mp["BB"] -= score
 		}
 		return score
 	} else if treenode.op_str == "BP" {
 		score = 1
-		if last_player == PLAYER_A {
-			if a == 2 && a_need_update {
-				a_mp["B"] += score
-				a_mp["BP"] += score
-			}
-		} else {
-			if b == 2 && b_need_update {
-				b_mp["B"] += score
-				b_mp["BP"] += score
-			}
+		if a == 2 && a_need_update {
+			a_mp["B"] += score
+			a_mp["BP"] += score
+		}
+		if b == 2 && b_need_update {
+			b_mp["B"] -= score
+			b_mp["BP"] -= score
 		}
 		return score
 	} else if treenode.op_str == "PBP" {
 		score = -1
-		if last_player == PLAYER_A {
-			if a == 2 && a_need_update {
-				a_mp["P"] += score
-				a_mp["PB"] += score
-				a_mp["PBP"] += score
-			}
-		} else {
-			if b == 2 && b_need_update {
-				b_mp["P"] += score
-				b_mp["PB"] += score
-				b_mp["PBP"] += score
-			}
+		if a == 2 && a_need_update {
+			a_mp["P"] += score
+			a_mp["PB"] += score
+			a_mp["PBP"] += score
+		}
+		if b == 2 && b_need_update {
+			b_mp["P"] -= score
+			b_mp["PB"] -= score
+			b_mp["PBP"] -= score
 		}
 		return score
 	} else if treenode.op_str == "PBB" {
@@ -232,18 +220,15 @@ func vs(treenode *node, a int, b int) int {
 		} else {
 			score = -2
 		}
-		if last_player == PLAYER_A {
-			if a == 2 && a_need_update {
-				a_mp["P"] += score
-				a_mp["PB"] += score
-				a_mp["PBB"] += score
-			}
-		} else {
-			if b == 2 && b_need_update {
-				b_mp["P"] += score
-				b_mp["PB"] += score
-				b_mp["PBB"] += score
-			}
+		if a == 2 && a_need_update {
+			a_mp["P"] += score
+			a_mp["PB"] += score
+			a_mp["PBB"] += score
+		}
+		if b == 2 && b_need_update {
+			b_mp["P"] -= score
+			b_mp["PB"] -= score
+			b_mp["PBB"] -= score
 		}
 		return score
 	}
@@ -253,7 +238,7 @@ func vs(treenode *node, a int, b int) int {
 		op = my_scheme(PLAYER_A, a, b, treenode.op_str)
 		last_player = PLAYER_A
 	} else {
-		op = fix_operate(PLAYER_B, a, b)
+		op = my_scheme(PLAYER_B, a, b, treenode.op_str)
 		last_player = PLAYER_B
 	}
 
@@ -277,7 +262,12 @@ func game() {
 	root := &node{op_str: ""}
 	root.left = &node{op_str: "P"}
 	root.right = &node{op_str: "B"}
-	profit := vs(root, a, b)
+	profit := 0
+	if last_player == PLAYER_B {
+		profit = vs(root, a, b)
+	} else {
+		profit = vs(root, b, a)
+	}
 	if profit > 0 {
 		win_A += 1
 	}
@@ -287,10 +277,10 @@ func game() {
 }
 
 func statistic() {
-	fmt.Println("A胜率统计: ", win_A)
-	fmt.Println("B胜率统计: ", N - win_A)
-	fmt.Println("A收益: ", profit_A)
-	fmt.Println("B收益: ", profit_B)
+	fmt.Println("先手胜率统计: ", win_A)
+	fmt.Println("后手胜率统计: ", N - win_A)
+	fmt.Println("先手收益: ", profit_A)
+	fmt.Println("后手收益: ", profit_B)
 }
 
 func main() {
